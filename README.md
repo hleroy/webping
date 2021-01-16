@@ -47,12 +47,15 @@ The latency measured is actually an HTTP latency: it includes browser processing
 
 ## Release History
 
+* 1.1.0
+    * Added IP information from ipinfo.io
+    * Added best latency column and auto-sort on this column
+
 * 1.0.0
     * Initial version
 
 ## Todo
 * Add a worldmap with datacenter locations
-* Add IP detection and WHOIS information
 
 ## Meta
 

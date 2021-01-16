@@ -33,7 +33,7 @@ function webping(url) {
    Ping all targets
 */
 function pingAllTargets() {
-  let td, svg, latency, endpoint, latenciesArr, latenciesStr;
+  let td_best_lat, td_sparkline, svg, latency, best_lat, endpoint, latenciesArr, latenciesStr;
   // Iterate other each element with "target" class
   Array.from(document.getElementsByClassName("target")).forEach(async (element) => {
     // Retrieve endpoint URL from DOM attribute
@@ -43,13 +43,27 @@ function pingAllTargets() {
       latency = await webping(endpoint);
       // Update latency result
       element.innerHTML = latency;
-      // Update data-latencies attribute
-      // It is comma-separated string with the latest 20 latencies
-      // First make sure there is a next <td> element in the row
-      td = element.nextElementSibling;
-      if (td !== null) {
+      // Update best latency
+      td_best_lat = element.nextElementSibling;
+      if (td_best_lat !== null) {
+        // Retrieve best latency within <td> element
+        let str = td_best_lat.innerHTML;
+        best_lat = parseInt(str, 10);
+        // Make sure we have a valid number
+        if (!Number.isNaN(best_lat)) {
+          if (latency < best_lat) {
+            td_best_lat.innerHTML = latency;
+          }
+        } else {
+          // If no valid number in <td>, store the current latency
+          td_best_lat.innerHTML = latency;
+        }
+      }
+      // Draw sparkline (data is stored in a data-attribute comma-separated string with the latest 20 latencies)
+      td_sparkline = td_best_lat.nextElementSibling;
+      if (td_sparkline !== null) {
         // Lookup first child of <td>, it is our svg
-        svg = element.nextElementSibling.firstElementChild;
+        svg = td_sparkline.firstElementChild;
         if (svg !== null) {
           // Retrieve latencies as a comma-separated string
           latenciesStr = svg.dataset.latencies;
@@ -96,8 +110,8 @@ function sortTable() {
       // Start by saying there should be no switching:
       shouldSwitch = false;
       // Get the two elements you want to compare, one from current row and one from the next
-      x = parseInt(rows[i].getElementsByTagName("TD")[1].innerHTML);
-      y = parseInt(rows[i + 1].getElementsByTagName("TD")[1].innerHTML);
+      x = parseInt(rows[i].getElementsByTagName("TD")[2].innerHTML);
+      y = parseInt(rows[i + 1].getElementsByTagName("TD")[2].innerHTML);
       // check if the two rows should switch place:
       if (x > y) {
         // If so, mark as a switch and break the loop:
@@ -129,6 +143,21 @@ document.addEventListener("DOMContentLoaded", function () {
       intervalId = setInterval(pingAllTargets, intervalDuration);
     }
   });
+
+  // Fetch client IP address and country / AS information
+  // Many thanks to ipinfo.io for its free API
+  fetch("https://ipinfo.io/json")
+    .then((response) => response.json())
+    .then((ipinfo) => {
+      let ip = ipinfo.ip;
+      let country = ipinfo.country;
+      let org = ipinfo.org;
+      document.getElementById("ip_addr").innerHTML = `<mark>${ip}</mark> (${org}) - ${country}`;
+    })
+    .catch(err => {
+      console.log(err);
+      document.getElementById("ip_addr").innerHTML ="Failed to retrieve IP address information";
+    });
 
   // Ping all targets every 1 seconds
   intervalId = setInterval(pingAllTargets, intervalDuration);

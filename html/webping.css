@@ -16,6 +16,18 @@ a:hover {
   color: lightgrey;
 }
 
+mark {
+  color: #fff;
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 80%,
+    #76FF03 80%,
+    #76FF03 100%
+  );
+	border-bottom: 2px #76FF03 solid;
+}
+
 .container {
   max-width: 960px;
 }
