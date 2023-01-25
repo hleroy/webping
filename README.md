@@ -47,6 +47,9 @@ The latency measured is actually an HTTP latency: it includes browser processing
 
 ## Release History
 
+* 1.2.0
+    * Added Microsoft targets (Teams, Outlook, Office Portal, Azure Portal)
+
 * 1.1.0
     * Added IP information from ipinfo.io
     * Added best latency column and auto-sort on this column
